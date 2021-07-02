@@ -1,0 +1,142 @@
+#include <stdio.h>
+char estado(int i) {
+    switch(i) {
+        case -1:
+            return 'X';
+        case 0:
+            return ' ';
+        case 1:
+            return 'O';
+    }
+}
+// determina si un jugador ha ganado, devuelve 0 de lo contrario.
+void dibujo(int b[9]) {
+    printf(" %c | %c | %c\n",estado(b[0]),estado(b[1]),estado(b[2]));
+    printf("---+---+---\n");
+    printf(" %c | %c | %c\n",estado(b[3]),estado(b[4]),estado(b[5]));
+    printf("---+---+---\n");
+    printf(" %c | %c | %c\n",estado(b[6]),estado(b[7]),estado(b[8]));
+}
+
+int ganaste(const int tablero[9]) {
+    
+    unsigned gana[8][3] = {{0,1,2},{3,4,5},{6,7,8},{0,3,6},{1,4,7},{2,5,8},{0,4,8},{2,4,6}};
+    int i;
+    for(i = 0; i < 8; ++i) {
+        if(tablero[gana[i][0]] != 0 &&
+           tablero[gana[i][0]] == tablero[gana[i][1]] &&
+           tablero[gana[i][0]] == tablero[gana[i][2]])
+            return tablero[gana[i][2]];
+    }
+    return 0;
+}
+
+int minimax(int tablero[9], int jugador) {
+    
+// ¿Cómo es la posición del jugador (su turno) a bordo?
+    int ganador = ganaste(tablero);
+    if(ganador != 0) return ganador*jugador;
+
+    int movimiento = -1;
+    int puntuacion = -2; // Perder los movimientos son preferibles a ningún movimiento
+    int i;
+    for(i = 0; i < 9; ++i) {// Para todos los movimientos,
+        if(tablero[i] == 0) {// Si es legal,
+            tablero[i] = jugador;// Prueba el movimiento
+            int thispuntuacion = -minimax(tablero, jugador*-1);
+            if(thispuntuacion > puntuacion) {
+                puntuacion = thispuntuacion;
+                movimiento = i;
+            }// Escoge el que es peor para el oponente
+            tablero[i] = 0;// Restablecer el tablero después de probar
+        }
+    }
+    if(movimiento == -1) return 0;
+    return puntuacion;
+}
+
+void maquinamovimiento(int tablero[9]) {
+    int movimiento = -1;
+    int puntuacion = -2;
+    int i;
+    for(i = 0; i < 9; ++i) {
+        if(tablero[i] == 0) {
+            tablero[i] = 1;
+            int temppuntuacion = -minimax(tablero, -1);
+            tablero[i] = 0;
+            if(temppuntuacion > puntuacion) {
+                puntuacion = temppuntuacion;
+                movimiento = i;
+            }
+        }
+    }
+    
+// devuelve una puntuación basada en el árbol de minimax en un nodo determinado.
+    tablero[movimiento] = 1;
+}
+
+void jugadormovimiento(int tablero[9]) {
+int movimiento = 0;
+do {
+start:
+printf("\nmovimiento ([0..8]): ");
+scanf("%d", &movimiento);
+if(tablero[movimiento] != 0) {
+printf("Ya esta ocupado");
+goto start;
+}
+printf("\n");
+} while (movimiento >= 9 || movimiento < 0 && tablero[movimiento] == 0);
+tablero[movimiento] = -1;
+}
+
+int TEST(int tablero[9], int jugador, int movimiento ){
+if(tablero[9] > movimiento){
+ printf("cierto \n");}
+  else{
+ printf("falso \n"); }
+  
+  if(tablero[9] >= movimiento){
+   for(int i=1; i=movimiento; i++){
+   
+   if(tablero[9] > movimiento){
+    printf("cierto \n");}
+   else{
+   
+    printf("ningun hijo cumple la condicion... \n");
+        }
+   }
+          }
+  }
+
+int main() {
+    int tablero[9] = {0,0,0,0,0,0,0,0,0};
+// los cuadrados de la computadora son 1, los cuadrados del jugador son -1.
+    printf("Maquina: O, Tu: X \noprima 1 para comenzar o 2 para que comienze primero la maquina \njugador (1) o jugador (2) ? ");
+    int jugador=0;
+    scanf("%d",&jugador);
+    printf("\n");
+    unsigned turn;
+    for(turn = 0; turn < 9 && ganaste(tablero) == 0; ++turn) {
+        if((turn+jugador) % 2 == 0)
+            maquinamovimiento(tablero);
+        else {
+            dibujo(tablero);
+            jugadormovimiento(tablero);
+        }
+    }
+    switch(ganaste(tablero)) {
+        case 0:
+            printf("Empate\n");
+            break;
+        case 1:
+            dibujo
+   (tablero);
+            printf("Perdiste\n");
+            break;
+        case -1:
+            printf("Ganaste!!!!!\n");
+            break;
+    } 
+
+}
